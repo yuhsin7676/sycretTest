@@ -11,7 +11,7 @@ $result = json_encode($result);
 echo $result;
 
 /********************************************************
-*
+*  Функции
 *********************************************************/
 
 function getApiGenDoc(){
@@ -37,18 +37,20 @@ function getApiGenDoc(){
 function genDoc($URLTemplate, $RecordID){
 
     $result = getApiGenDoc();
-    $strs = explode(" ", json_decode($result)->resultdata);
+    $resultdata = explode(" ", json_decode($result)->resultdata);
 
-    $sxe = new SimpleXMLElement('https://sycret.ru/service/apigendoc/forma_025u.xml', 0, true);
+    $simpleXMLElement = new SimpleXMLElement('https://sycret.ru/service/apigendoc/forma_025u.xml', 0, true);
 
-    $sxeW = $sxe->children('w', true)->body->children('wx', true)->sect->children('ns1', true)->use->children('w', true);
-    $sxeT0 = $sxeW->tbl[4]->tr->tc[1]->p->children('ns1', true)->use->text[0]->children('w', true)->r->t;
-    $sxeT1 = $sxeW->tbl[4]->tr->tc[1]->p->children('ns1', true)->use->text[1]->children('w', true)->r->t;
-    $sxeT2 = $sxeW->tbl[4]->tr->tc[1]->p->children('ns1', true)->use->text[2]->children('w', true)->r->t;
+    $useElement = $simpleXMLElement->children('w', true)->body->children('wx', true)
+    ->sect->children('ns1', true)->use->children('w', true)
+    ->tbl[4]->tr->tc[1]->p->children('ns1', true)->use;
+    $surname = $useElement->text[0]->children('w', true)->r->t;
+    $name = $useElement->text[1]->children('w', true)->r->t;
+    $secondname = $useElement->text[2]->children('w', true)->r->t;
 
-    $sxeT0[0] = $strs[0];
-    $sxeT1[0] = $strs[1];
-    $sxeT2[0] = $strs[2];
+    $surname[0] = $resultdata[0];
+    $name[0] = $resultdata[1];
+    $secondname[0] = $resultdata[2];
 
     $xml = $sxe->asXML();
 
@@ -58,7 +60,7 @@ function genDoc($URLTemplate, $RecordID){
         mkdir("generate");
 
     file_put_contents("generate/".$today.".doc", $xml);
-    //file_put_contents("generate/".$today.".pdf", $a);
+    //file_put_contents("generate/".$today.".pdf", $xml);
 
     $result = array(
         "URLWord" => "/".$today.".doc",
